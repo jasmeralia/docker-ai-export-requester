@@ -1,0 +1,18 @@
+services:
+  exporter:
+    build: .
+    container_name: chatgpt-export-requester
+    working_dir: /app
+    environment:
+      HEADLESS: "true"
+      CHATGPT_BASE_URL: "https://chatgpt.com"
+      PROFILE_PATH: "/app/profile"
+      LOG_DIR: "/app/logs"
+      SCREENSHOT_DIR: "/app/screenshots"
+      REQUEST_TIMEOUT_MS: "30000"
+    volumes:
+      - ./profile:/app/profile
+      - ./logs:/app/logs
+      - ./screenshots:/app/screenshots
+      - ./chatgpt-export-requester-context.md:/app/chatgpt-export-requester-context.md:ro
+    command: ["request"]

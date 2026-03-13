@@ -1,0 +1,7 @@
+profile/
+logs/
+screenshots/
+__pycache__/
+*.pyc
+*.pyo
+*.log
