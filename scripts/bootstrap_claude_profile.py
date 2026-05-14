@@ -1,12 +1,13 @@
-import os
 import sys
 from pathlib import Path
 
 from playwright.sync_api import sync_playwright
 
-BASE_URL = os.environ.get("CLAUDE_BASE_URL", "https://claude.ai")
-PROFILE_PATH = os.environ.get("PROFILE_PATH", "/app/claude-profile")
-SCREENSHOT_DIR = Path(os.environ.get("SCREENSHOT_DIR", "/app/screenshots"))
+from settings import settings
+
+BASE_URL = settings.claude_base_url
+PROFILE_PATH = settings.claude_profile_path
+SCREENSHOT_DIR = Path(settings.screenshot_dir)
 SCREENSHOT_DIR.mkdir(parents=True, exist_ok=True)
 
 
