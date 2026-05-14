@@ -1,4 +1,4 @@
-.PHONY: lint lint-ruff lint-mypy venv
+.PHONY: lint lint-fix lint-ruff lint-mypy venv
 
 VENV := .venv
 PYTHON := $(VENV)/bin/python
@@ -6,6 +6,10 @@ PIP := $(VENV)/bin/pip
 VENV_STAMP := $(VENV)/.installed
 
 venv: $(VENV_STAMP)
+
+lint-fix: $(VENV_STAMP)
+	$(PYTHON) -m ruff check --fix .
+	$(PYTHON) -m ruff format .
 
 lint: $(VENV_STAMP) lint-ruff lint-mypy
 
