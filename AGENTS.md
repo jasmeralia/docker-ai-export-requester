@@ -35,6 +35,19 @@ Do not add:
 - Exit nonzero on failure
 - Keep selectors readable and easy to update
 
+## After Any Code Change
+
+```bash
+make lint-fix && make lint
+```
+
+Resolve all reported issues before committing.
+
+## Git Workflow
+
+- Never push commits directly to `master`. Always open a pull request from a feature/fix branch.
+- Use squash merge strategy when merging pull requests.
+
 ## Debugging approach
 1. Inspect latest screenshot in `screenshots/`
 2. Run `bootstrap` or `claude-bootstrap` mode non-headless
