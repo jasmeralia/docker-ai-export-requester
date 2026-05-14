@@ -11,7 +11,6 @@ from playwright.sync_api import (
 from playwright.sync_api import (
     TimeoutError as PlaywrightTimeoutError,
 )
-
 from settings import settings
 
 BASE_URL = settings.chatgpt_base_url
