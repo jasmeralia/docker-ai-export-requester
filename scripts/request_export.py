@@ -1,5 +1,4 @@
 import json
-import os
 import sys
 from datetime import UTC, datetime
 from pathlib import Path
@@ -13,12 +12,14 @@ from playwright.sync_api import (
     TimeoutError as PlaywrightTimeoutError,
 )
 
-BASE_URL = os.environ.get("CHATGPT_BASE_URL", "https://chatgpt.com")
-PROFILE_PATH = os.environ.get("PROFILE_PATH", "/app/profile")
-LOG_DIR = Path(os.environ.get("LOG_DIR", "/app/logs"))
-SCREENSHOT_DIR = Path(os.environ.get("SCREENSHOT_DIR", "/app/screenshots"))
-HEADLESS = os.environ.get("HEADLESS", "true").lower() == "true"
-REQUEST_TIMEOUT_MS = int(os.environ.get("REQUEST_TIMEOUT_MS", "30000"))
+from settings import settings
+
+BASE_URL = settings.chatgpt_base_url
+PROFILE_PATH = settings.chatgpt_profile_path
+LOG_DIR = Path(settings.log_dir)
+SCREENSHOT_DIR = Path(settings.screenshot_dir)
+HEADLESS = settings.headless
+REQUEST_TIMEOUT_MS = settings.request_timeout_ms
 
 LOG_DIR.mkdir(parents=True, exist_ok=True)
 SCREENSHOT_DIR.mkdir(parents=True, exist_ok=True)

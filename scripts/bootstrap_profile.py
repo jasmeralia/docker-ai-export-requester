@@ -1,12 +1,13 @@
-import os
 import sys
 from pathlib import Path
 
 from playwright.sync_api import sync_playwright
 
-BASE_URL = os.environ.get("CHATGPT_BASE_URL", "https://chatgpt.com")
-PROFILE_PATH = os.environ.get("PROFILE_PATH", "/app/profile")
-SCREENSHOT_DIR = Path(os.environ.get("SCREENSHOT_DIR", "/app/screenshots"))
+from settings import settings
+
+BASE_URL = settings.chatgpt_base_url
+PROFILE_PATH = settings.chatgpt_profile_path
+SCREENSHOT_DIR = Path(settings.screenshot_dir)
 SCREENSHOT_DIR.mkdir(parents=True, exist_ok=True)
 
 
