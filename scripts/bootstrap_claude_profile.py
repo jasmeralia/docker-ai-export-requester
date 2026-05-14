@@ -2,7 +2,6 @@ import sys
 from pathlib import Path
 
 from playwright.sync_api import sync_playwright
-
 from settings import settings
 
 BASE_URL = settings.claude_base_url
