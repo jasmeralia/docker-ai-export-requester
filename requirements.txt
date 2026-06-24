@@ -1,2 +1,2 @@
 playwright==1.60.0
-pydantic-settings>=2.14.1
+pydantic-settings>=2.14.2
