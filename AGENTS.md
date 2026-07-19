@@ -38,7 +38,7 @@ Do not add:
 ## After Any Code Change
 
 ```bash
-make lint-fix && make lint
+make lintfix && make lint
 ```
 
 Resolve all reported issues before committing.
