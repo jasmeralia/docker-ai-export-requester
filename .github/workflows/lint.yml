@@ -12,6 +12,7 @@ concurrency:
 
 jobs:
   lint:
+    name: Lint and Test
     runs-on: ubuntu-latest
 
     steps:
@@ -25,3 +26,13 @@ jobs:
 
       - name: Run lint and type checks
         run: make lint
+
+      - name: Run tests
+        run: make test
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: coverage.xml
+          fail_ci_if_error: false

@@ -31,9 +31,11 @@ Run:
 
 ```bash
 make lint
+make test
 ```
 
-`make lint` will create `.venv/`, install `requirements-dev.txt`, and run `ruff` plus `mypy` from that virtual environment.
+`make lint` runs `ruff` and `mypy`. `make test` runs pytest and writes
+`coverage.xml` for Codecov; coverage remains informational until it reaches 80%.
 
 ### 2. Bootstrap the browser profiles
 Run once per service, non-headless, and log in manually:

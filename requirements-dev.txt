@@ -2,3 +2,5 @@ playwright==1.62.0
 ruff
 mypy
 pydantic-settings>=2.15.0
+pytest
+pytest-cov
