@@ -188,5 +188,6 @@ def main() -> int:
         write_log(payload)
         return 4
 
+
 if __name__ == "__main__":
     sys.exit(main())

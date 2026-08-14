@@ -1,4 +1,4 @@
-.PHONY: lint lintfix lint-ruff lint-mypy venv
+.PHONY: lint lintfix lint-ruff lint-mypy test venv
 
 VENV := .venv
 PYTHON := $(VENV)/bin/python
@@ -24,3 +24,6 @@ lint-ruff:
 
 lint-mypy:
 	$(PYTHON) -m mypy
+
+test: $(VENV_STAMP)
+	$(PYTHON) -m pytest --cov=scripts --cov-report=term-missing --cov-report=xml:coverage.xml

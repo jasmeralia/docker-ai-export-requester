@@ -174,9 +174,7 @@ def main() -> int:
                     try:
                         page.get_by_text(text, exact=True).first.click(timeout=5000)
                         clicked = True
-                        payload["notes"].append(
-                            f"Clicked export using exact visible text: {text}"
-                        )
+                        payload["notes"].append(f"Clicked export using exact visible text: {text}")
                         break
                     except Exception:
                         continue
