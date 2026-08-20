@@ -4,22 +4,23 @@ from pathlib import Path
 from playwright.sync_api import sync_playwright
 from settings import settings
 
-BASE_URL = settings.chatgpt_base_url
-PROFILE_PATH = settings.chatgpt_profile_path
-SCREENSHOT_DIR = Path(settings.screenshot_dir)
-SCREENSHOT_DIR.mkdir(parents=True, exist_ok=True)
-
 
 def main() -> int:
+    base_url = settings.chatgpt_base_url
+    profile_path = settings.chatgpt_profile_path
+    screenshot_dir = Path(settings.screenshot_dir)
+
+    screenshot_dir.mkdir(parents=True, exist_ok=True)
+
     with sync_playwright() as p:
         context = p.chromium.launch_persistent_context(
-            PROFILE_PATH,
+            profile_path,
             headless=False,
             viewport={"width": 1600, "height": 1200},
         )
         page = context.new_page()
-        page.goto(BASE_URL, wait_until="domcontentloaded")
-        page.screenshot(path=str(SCREENSHOT_DIR / "bootstrap-opened.png"), full_page=True)
+        page.goto(base_url, wait_until="domcontentloaded")
+        page.screenshot(path=str(screenshot_dir / "bootstrap-opened.png"), full_page=True)
 
         print("")
         print("Bootstrap mode is running.")
