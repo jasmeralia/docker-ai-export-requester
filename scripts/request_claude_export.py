@@ -13,19 +13,6 @@ from playwright.sync_api import (
 )
 from settings import settings
 
-BASE_URL = settings.claude_base_url
-PROFILE_PATH = settings.claude_profile_path
-LOG_DIR = Path(settings.log_dir)
-SCREENSHOT_DIR = Path(settings.screenshot_dir)
-HEADLESS = settings.headless
-REQUEST_TIMEOUT_MS = settings.request_timeout_ms
-
-LOG_DIR.mkdir(parents=True, exist_ok=True)
-SCREENSHOT_DIR.mkdir(parents=True, exist_ok=True)
-
-ts = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
-run_log = LOG_DIR / f"claude-export-request-{ts}.json"
-
 
 class RunPayload(TypedDict):
     timestamp_utc: str
@@ -36,21 +23,34 @@ class RunPayload(TypedDict):
     notes: list[str]
 
 
-def write_log(payload: RunPayload) -> None:
+def write_log(run_log: Path, payload: RunPayload) -> None:
     run_log.write_text(json.dumps(payload, indent=2), encoding="utf-8")
 
 
-def save_shot(page: Page, name: str) -> str:
-    path = SCREENSHOT_DIR / f"{ts}-claude-{name}.png"
+def save_shot(page: Page, screenshot_dir: Path, ts: str, name: str) -> str:
+    path = screenshot_dir / f"{ts}-claude-{name}.png"
     page.screenshot(path=str(path), full_page=True)
     return str(path)
 
 
 def main() -> int:
+    base_url = settings.claude_base_url
+    profile_path = settings.claude_profile_path
+    log_dir = Path(settings.log_dir)
+    screenshot_dir = Path(settings.screenshot_dir)
+    headless = settings.headless
+    request_timeout_ms = settings.request_timeout_ms
+
+    log_dir.mkdir(parents=True, exist_ok=True)
+    screenshot_dir.mkdir(parents=True, exist_ok=True)
+
+    ts = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
+    run_log = log_dir / f"claude-export-request-{ts}.json"
+
     payload: RunPayload = {
         "timestamp_utc": ts,
-        "base_url": BASE_URL,
-        "headless": HEADLESS,
+        "base_url": base_url,
+        "headless": headless,
         "status": "started",
         "screenshots": [],
         "notes": [],
@@ -59,20 +59,20 @@ def main() -> int:
     try:
         with sync_playwright() as p:
             context = p.chromium.launch_persistent_context(
-                PROFILE_PATH,
-                headless=HEADLESS,
+                profile_path,
+                headless=headless,
                 viewport={"width": 1600, "height": 1200},
             )
             page = context.new_page()
-            page.set_default_timeout(REQUEST_TIMEOUT_MS)
+            page.set_default_timeout(request_timeout_ms)
 
-            page.goto(BASE_URL, wait_until="domcontentloaded")
-            payload["screenshots"].append(save_shot(page, "01-home"))
+            page.goto(base_url, wait_until="domcontentloaded")
+            payload["screenshots"].append(save_shot(page, screenshot_dir, ts, "01-home"))
 
             if "login" in page.url.lower() or "auth" in page.url.lower():
                 payload["status"] = "failed"
                 payload["notes"].append("Profile does not appear to be logged in to Claude.")
-                write_log(payload)
+                write_log(run_log, payload)
                 context.close()
                 return 1
 
@@ -115,14 +115,16 @@ def main() -> int:
                 except Exception:
                     payload["notes"].append("Could not open settings or user menu.")
 
-            payload["screenshots"].append(save_shot(page, "02-menu-or-settings"))
+            payload["screenshots"].append(
+                save_shot(page, screenshot_dir, ts, "02-menu-or-settings")
+            )
 
             # Try direct navigation to settings page.
             tried_direct = False
             for path in ("/settings", "/settings/account"):
                 try:
                     page.goto(
-                        f"{BASE_URL.rstrip('/')}{path}",
+                        f"{base_url.rstrip('/')}{path}",
                         wait_until="domcontentloaded",
                         timeout=10000,
                     )
@@ -145,7 +147,7 @@ def main() -> int:
                 except Exception:
                     pass
 
-            payload["screenshots"].append(save_shot(page, "03-settings"))
+            payload["screenshots"].append(save_shot(page, screenshot_dir, ts, "03-settings"))
 
             # Final action: click Export Data (or similar)
             clicked = False
@@ -189,30 +191,30 @@ def main() -> int:
                     except Exception:
                         continue
 
-            payload["screenshots"].append(save_shot(page, "04-post-click"))
+            payload["screenshots"].append(save_shot(page, screenshot_dir, ts, "04-post-click"))
 
             if not clicked:
                 payload["status"] = "failed"
                 payload["notes"].append("Could not find or click export button.")
-                write_log(payload)
+                write_log(run_log, payload)
                 context.close()
                 return 2
 
             payload["status"] = "success"
             payload["notes"].append("Export request click issued.")
-            write_log(payload)
+            write_log(run_log, payload)
             context.close()
             return 0
 
     except PlaywrightTimeoutError as exc:
         payload["status"] = "failed"
         payload["notes"].append(f"Timeout: {exc}")
-        write_log(payload)
+        write_log(run_log, payload)
         return 3
     except Exception as exc:
         payload["status"] = "failed"
         payload["notes"].append(f"Unhandled exception: {type(exc).__name__}: {exc}")
-        write_log(payload)
+        write_log(run_log, payload)
         return 4
 
 
